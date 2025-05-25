@@ -1,0 +1,50 @@
+# 🚫 General
+.DS_Store
+Thumbs.db
+.env
+.env.*.local
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 🖥 IDE / Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# 🐢 Node.js / Backend
+/backend/node_modules/
+backend/package-lock.json
+backend/.env
+
+# ⚛️ React / Frontend
+/frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/package-lock.json
+frontend/yarn.lock
+
+# 📦 Vite
+frontend/.vite/
+frontend/.cache/
+frontend/.eslintcache
+
+# 🔄 Build artifacts
+build/
+coverage/
+*.tsbuildinfo
+
+# 🐳 Docker (si lo usas)
+docker-compose.override.yml
+*.local.yml
+
+# 📁 Logs / uploads / temp
+logs/
+uploads/
+tmp/
+temp/
