@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { UserPlus, Mail, Lock, User, Phone, IdCard } from "lucide-react";
+import { UserPlus, Mail, Lock, User, Phone, Badge } from "lucide-react";
 
 import Card from "../../components/common/Card";
 import FormField from "../../components/common/FormField";
@@ -155,7 +155,7 @@ const Register = () => {
               onChange={handleChange}
               error={errors.dni}
               required
-              icon={<IdCard className="h-5 w-5 text-gray-400" />}
+              icon={<Badge className="h-5 w-5 text-gray-400" />}
               placeholder="Ingrese su número de DNI"
               helper="Debe contener 8 dígitos"
             />
