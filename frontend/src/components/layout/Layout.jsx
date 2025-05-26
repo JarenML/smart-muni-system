@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
-import Sidebar from "../admin/Sidebar";
+import Sidebar from "../admin/Sidebar"; // 🛠 Ruta corregida
 import Navbar from "./Navbar";
-import NotificationContainer from "../common/NotificationContainer";
+import NotificationContainer from "../common/NotificationContainer"; // 🛠 Ruta corregida
 
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);

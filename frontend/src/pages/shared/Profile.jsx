@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, Mail, Phone, Key, Save, Badge } from "lucide-react";
+import { User, Mail, Phone, Key, Save, IdCard } from "lucide-react";
 
 import Card from "../../components/common/Card";
 import FormField from "../../components/common/FormField";
@@ -161,7 +161,7 @@ const Profile = () => {
                   value={profile.phone}
                 />
                 <InfoRow
-                  icon={<Badge className="h-4 w-4 mr-2" />}
+                  icon={<IdCard className="h-4 w-4 mr-2" />}
                   label="DNI"
                   value={profile.dni}
                 />
