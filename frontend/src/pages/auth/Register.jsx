@@ -1,91 +1,98 @@
 // Register.jsx - Archivo base generado
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus, Mail, Lock, User, Phone } from 'lucide-react';
-import Card from '../../components/UI/Card';
-import FormField from '../../components/UI/FormField';
-import Button from '../../components/UI/Button';
-import { useAuth } from '../../contexts/AuthContext';
-import { useNotification } from '../../contexts/NotificationContext';
-import { 
-  validateEmail, 
-  validateRequired, 
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserPlus, Mail, Lock, User, Phone } from "lucide-react";
+import Card from "../../components/common/Card";
+import FormField from "../../components/common/FormField";
+import Button from "../../components/common/Button";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNotification } from "../../contexts/NotificationContext";
+import {
+  validateEmail,
+  validateRequired,
   validateMinLength,
-  validatePhone 
-} from '../../utils/validators';
+  validatePhone,
+} from "../../utils/validators";
 
 const Register = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
   const { addNotification } = useNotification();
-  
+
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
   });
-  
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-    
+
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: null
+        [name]: null,
       }));
     }
   };
-  
+
   const validateForm = () => {
     const newErrors = {};
-    
-    const nameValidation = validateRequired(form.name, 'El nombre');
+
+    const nameValidation = validateRequired(form.name, "El nombre");
     if (nameValidation !== true) {
       newErrors.name = nameValidation;
     }
-    
+
     const emailValidation = validateEmail(form.email);
     if (emailValidation !== true) {
       newErrors.email = emailValidation;
     }
-    
+
     const phoneValidation = validatePhone(form.phone);
     if (phoneValidation !== true) {
       newErrors.phone = phoneValidation;
     }
-    
-    const passwordValidation = validateMinLength(form.password, 6, 'La contraseña');
+
+    const passwordValidation = validateMinLength(
+      form.password,
+      6,
+      "La contraseña"
+    );
     if (passwordValidation !== true) {
       newErrors.password = passwordValidation;
     }
-    
+
     if (form.password !== form.confirmPassword) {
-      newErrors.confirmPassword = 'Las contraseñas no coinciden';
+      newErrors.confirmPassword = "Las contraseñas no coinciden";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
-      addNotification('Por favor, corrija los errores en el formulario', 'error');
+      addNotification(
+        "Por favor, corrija los errores en el formulario",
+        "error"
+      );
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       const result = await register({
         name: form.name,
@@ -93,20 +100,23 @@ const Register = () => {
         phone: form.phone,
         password: form.password,
       });
-      
+
       if (result.success) {
-        addNotification('Registro exitoso. Por favor, inicie sesión', 'success');
-        navigate('/login');
+        addNotification(
+          "Registro exitoso. Por favor, inicie sesión",
+          "success"
+        );
+        navigate("/login");
       } else {
-        addNotification(result.error || 'Error al registrar usuario', 'error');
+        addNotification(result.error || "Error al registrar usuario", "error");
       }
     } catch (error) {
-      addNotification('Error al registrar usuario', 'error');
+      addNotification("Error al registrar usuario", "error");
     } finally {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -119,8 +129,11 @@ const Register = () => {
           Crear Cuenta
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          ¿Ya tienes una cuenta?{' '}
-          <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
+          ¿Ya tienes una cuenta?{" "}
+          <Link
+            to="/login"
+            className="font-medium text-blue-600 hover:text-blue-500"
+          >
             Inicia sesión aquí
           </Link>
         </p>
@@ -140,7 +153,7 @@ const Register = () => {
               icon={<User className="h-5 w-5 text-gray-400" />}
               placeholder="Tu nombre completo"
             />
-            
+
             <FormField
               label="Correo Electrónico"
               id="email"
@@ -153,7 +166,7 @@ const Register = () => {
               icon={<Mail className="h-5 w-5 text-gray-400" />}
               placeholder="correo@ejemplo.com"
             />
-            
+
             <FormField
               label="Teléfono"
               id="phone"
@@ -166,7 +179,7 @@ const Register = () => {
               placeholder="9XXXXXXXX"
               helper="Formato: 9XXXXXXXX (9 dígitos)"
             />
-            
+
             <FormField
               label="Contraseña"
               id="password"
@@ -180,7 +193,7 @@ const Register = () => {
               placeholder="••••••••"
               helper="Mínimo 6 caracteres"
             />
-            
+
             <FormField
               label="Confirmar Contraseña"
               id="confirmPassword"
@@ -193,7 +206,7 @@ const Register = () => {
               icon={<Lock className="h-5 w-5 text-gray-400" />}
               placeholder="••••••••"
             />
-            
+
             <div>
               <Button
                 type="submit"
