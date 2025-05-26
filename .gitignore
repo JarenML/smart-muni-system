@@ -39,7 +39,7 @@ build/
 coverage/
 *.tsbuildinfo
 
-# 🐳 Docker (si lo usas)
+# 🐳 Docker
 docker-compose.override.yml
 *.local.yml
 
