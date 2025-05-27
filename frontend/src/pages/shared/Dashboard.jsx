@@ -10,13 +10,17 @@ const Dashboard = () => {
 
   if (user?.role === "admin") {
     return (
+      <AdminLayout>
         <DashboardAdmin />
+      </AdminLayout>
     );
   }
 
   if (user?.role === "ciudadano") {
     return (
+      <CiudadanoLayout>
         <DashboardCiudadano />
+      </CiudadanoLayout>
     );
   }
 

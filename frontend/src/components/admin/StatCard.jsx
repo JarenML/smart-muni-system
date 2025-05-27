@@ -1,45 +1,47 @@
 import React from "react";
+import { TrendingUp, TrendingDown } from "lucide-react";
 
 const StatCard = ({
   title,
   value,
   icon,
   change,
-  changeType = "increase",
+  changeType = "increase", // "increase" | "decrease"
   footer,
 }) => {
-  const changeColor =
-    changeType === "increase" ? "text-green-500" : "text-red-500";
-  const changeIcon = changeType === "increase" ? "↑" : "↓";
+  const isIncrease = changeType === "increase";
+  const changeColor = isIncrease ? "text-green-600" : "text-red-600";
+  const changeBg = isIncrease ? "bg-green-100" : "bg-red-100";
+  const changeIcon = isIncrease ? (
+    <TrendingUp className="w-4 h-4 mr-1" />
+  ) : (
+    <TrendingDown className="w-4 h-4 mr-1" />
+  );
 
   return (
-    <div className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow duration-300">
-      <div className="p-5">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500 truncate">
-              {title}
-            </p>
-            <p className="mt-1 text-3xl font-semibold text-gray-900">{value}</p>
-          </div>
-          <div className="p-2 bg-blue-50 rounded-lg text-blue-600">{icon}</div>
+    <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
+      <div className="flex items-center justify-between">
+        <div className="p-3 rounded-lg bg-blue-50 text-blue-600 border border-blue-100">
+          {icon}
         </div>
-
-        {change && (
-          <div className="mt-4">
-            <div className={`flex items-baseline text-sm ${changeColor}`}>
-              <span>
-                {changeIcon} {change}%
-              </span>
-              <span className="ml-2 text-gray-500">
-                respecto al mes anterior
-              </span>
-            </div>
+        {change !== undefined && (
+          <div
+            className={`flex items-center text-sm font-medium ${changeColor}`}
+          >
+            {changeIcon}
+            <span>{change}%</span>
           </div>
         )}
       </div>
 
-      {footer && <div className="bg-gray-50 px-5 py-3">{footer}</div>}
+      <div className="mt-4">
+        <h3 className="text-2xl font-bold text-gray-900">{value}</h3>
+        <p className="text-sm font-medium text-gray-600 mt-1">{title}</p>
+
+        {footer && (
+          <div className="mt-4 pt-4 border-t border-gray-100">{footer}</div>
+        )}
+      </div>
     </div>
   );
 };
