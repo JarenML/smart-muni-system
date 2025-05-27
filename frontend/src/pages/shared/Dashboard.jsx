@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import DashboardAdmin from "../admin/DashboardAdmin";
-import DashboardCiudadano from "../ciudadano/Dashboard";
+import DashboardCiudadano from "../ciudadano/DashboardCiudadano";
 import AdminLayout from "../../components/layout/AdminLayout";
 import CiudadanoLayout from "../../components/layout/CiudadanoLayout";
 

@@ -26,6 +26,9 @@ import ResumeForm from "../pages/ciudadano/UploadResume";
 import ResumeDetail from "../pages/ciudadano/ResumeDetail";
 import ChatBot from "../pages/ciudadano/ChatBot";
 
+import DashboardAdmin from "../pages/admin/DashboardAdmin";
+import DashboardCiudadano from "../pages/ciudadano/DashboardCiudadano";
+
 // Admin
 import GestionTramites from "../pages/admin/GestionTramites";
 import GestionCV from "../pages/admin/GestionCV";
@@ -50,7 +53,15 @@ const AppRouter = () => {
         path="/dashboard"
         element={
           <PrivateRoute allowedRoles={["admin", "ciudadano"]}>
-            <Dashboard />
+            {user?.role === "admin" ? (
+              <AdminLayout>
+                <DashboardAdmin />
+              </AdminLayout>
+            ) : (
+              <CiudadanoLayout>
+                <DashboardCiudadano />
+              </CiudadanoLayout>
+            )}
           </PrivateRoute>
         }
       />
@@ -117,17 +128,15 @@ const AppRouter = () => {
         }
       />
 
-      {/* Admin */}
       <Route
         path="/admin"
         element={
           <PrivateRoute allowedRoles={["admin"]}>
-            <AdminLayout>
-              <Dashboard />
-            </AdminLayout>
+            <Dashboard />
           </PrivateRoute>
         }
       />
+
       <Route
         path="/admin/tramites"
         element={
