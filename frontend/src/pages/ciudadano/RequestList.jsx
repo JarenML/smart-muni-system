@@ -67,7 +67,7 @@ const RequestList = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            Trámites Ciudadanos
+            Mis Tramites 
           </h1>
           <p className="mt-1 text-sm text-gray-500">
             Gestione todos los trámites municipales en un solo lugar

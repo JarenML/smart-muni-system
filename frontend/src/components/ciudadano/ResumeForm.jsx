@@ -375,7 +375,7 @@ const ResumeForm = () => {
         <Button
           type="button"
           variant="outline"
-          onClick={() => navigate("/curriculos")}
+          onClick={() => navigate("/dashboard")}
         >
           Cancelar
         </Button>

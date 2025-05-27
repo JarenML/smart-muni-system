@@ -11,6 +11,7 @@ import Card from "../../components/common/Card";
 import Button from "../../components/common/Button";
 
 const ChatBot = () => {
+  const [activeTab, setActiveTab] = useState("tramite");
   const [messages, setMessages] = useState([
     {
       from: "bot",
@@ -45,44 +46,51 @@ const ChatBot = () => {
     <div className="max-w-5xl mx-auto mt-8 px-4 space-y-6">
       <h1 className="text-3xl font-bold text-gray-900">Consulta Inteligente</h1>
 
-      {/* Tipo de consulta */}
+      {/* Pestañas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="border border-blue-500 bg-blue-50 text-blue-700 rounded-lg p-4 flex items-center space-x-3 transition hover:shadow-md cursor-pointer">
+        <button
+          onClick={() => setActiveTab("tramite")}
+          className={`border rounded-lg p-4 flex items-center space-x-3 transition hover:shadow-md cursor-pointer w-full
+            ${activeTab === "tramite" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-300"}
+          `}
+        >
           <FileText className="h-6 w-6" />
           <div>
             <p className="font-semibold">Consultar Trámite</p>
             <p className="text-sm">Revisa el estado de tu trámite</p>
           </div>
-        </div>
-        <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-3 hover:shadow-md cursor-pointer">
-          <BadgeCheck className="h-6 w-6 text-gray-500" />
+        </button>
+
+        <button
+          onClick={() => setActiveTab("cv")}
+          className={`border rounded-lg p-4 flex items-center space-x-3 transition hover:shadow-md cursor-pointer w-full
+            ${activeTab === "cv" ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-300"}
+          `}
+        >
+          <BadgeCheck className="h-6 w-6" />
           <div>
             <p className="font-semibold">Consultar Currículum</p>
-            <p className="text-sm text-gray-500">Analiza tu CV</p>
+            <p className="text-sm">Analiza tu CV</p>
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Área de carga */}
       <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center text-center transition hover:bg-gray-50">
         <UploadCloud className="h-10 w-10 text-gray-400 mb-2" />
         <p className="text-sm text-gray-600">
-          Arrastra o haz clic para subir tu documento
+          Arrastra o haz clic para subir tu documento {activeTab === "cv" ? "curricular" : "de trámite"}
         </p>
         <p className="text-xs text-gray-400 mb-3">PDF, DOC, DOCX (máx. 5MB)</p>
-        <Button variant="primary" size="sm">
-          Seleccionar archivo
-        </Button>
+        <Button variant="primary" size="sm">Seleccionar archivo</Button>
       </div>
 
       {/* Chat */}
       <Card>
-        {/* Encabezado del Bot */}
+        {/* Encabezado */}
         <div className="flex items-center space-x-2 mb-3">
           <Bot className="h-5 w-5 text-green-500" />
-          <span className="text-sm font-medium text-gray-700">
-            Asistente Virtual
-          </span>
+          <span className="text-sm font-medium text-gray-700">Asistente Virtual</span>
           <span className="text-xs text-green-600">En línea</span>
         </div>
 
@@ -104,29 +112,27 @@ const ChatBot = () => {
 
         {/* Sugerencias rápidas */}
         <div className="flex flex-wrap gap-2 mt-4">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() =>
-              handleSuggestion(
-                "¿Por qué mi trámite fue clasificado como urgente?"
-              )
-            }
-          >
-            ¿Por qué mi trámite fue clasificado como urgente?
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() =>
-              handleSuggestion("¿Qué le falta a mi CV para mejorar?")
-            }
-          >
-            ¿Qué le falta a mi CV para mejorar?
-          </Button>
+          {activeTab === "tramite" && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleSuggestion("¿Por qué mi trámite fue clasificado como urgente?")}
+            >
+              ¿Por qué mi trámite fue clasificado como urgente?
+            </Button>
+          )}
+          {activeTab === "cv" && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleSuggestion("¿Qué le falta a mi CV para mejorar?")}
+            >
+              ¿Qué le falta a mi CV para mejorar?
+            </Button>
+          )}
         </div>
 
-        {/* Input de usuario */}
+        {/* Input */}
         <form onSubmit={handleSend} className="flex items-center gap-2 mt-4">
           <input
             type="text"
@@ -139,9 +145,7 @@ const ChatBot = () => {
             type="submit"
             variant="primary"
             icon={<Send className="h-4 w-4" />}
-          >
-            {/* texto opcional o vacío */}
-          </Button>
+          />
         </form>
       </Card>
     </div>

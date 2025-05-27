@@ -1,6 +1,7 @@
 // src/components/ciudadano/SidebarCiudadano.jsx
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext"; // ✅ AGREGADO
 import {
   LayoutDashboard,
   FileText,
@@ -12,6 +13,8 @@ import {
 } from "lucide-react";
 
 const SidebarCiudadano = ({ isOpen, closeSidebar }) => {
+  const { user } = useAuth(); // ✅ AGREGADO
+
   const navItems = [
     {
       path: "/dashboard",
@@ -120,14 +123,16 @@ const SidebarCiudadano = ({ isOpen, closeSidebar }) => {
         </div>
       </nav>
 
-      {/* Info Usuario */}
+      {/* Info Usuario - ✅ CORREGIDO */}
       <div className="absolute bottom-0 w-full p-4 border-t border-gray-800">
         <div className="flex items-center space-x-3">
           <div className="bg-blue-600 text-white p-1 rounded-full">
             <User className="h-5 w-5" />
           </div>
           <div>
-            <p className="text-sm font-medium text-white">Lucas Rojas</p>
+            <p className="text-sm font-medium text-white">
+              {user?.name || user?.nombre || 'Usuario'}
+            </p>
             <p className="text-xs text-gray-400">Ciudadano</p>
           </div>
         </div>

@@ -66,6 +66,18 @@ const AppRouter = () => {
         }
       />
 
+            // En AppRouter.jsx, agregar esta ruta en la sección de Ciudadano:
+      <Route
+        path="/curriculos/enviados"
+        element={
+          <PrivateRoute allowedRoles={["ciudadano"]}>
+            <CiudadanoLayout>
+              <ResumeList /> {/* Necesitas crear este componente para ciudadano */}
+            </CiudadanoLayout>
+          </PrivateRoute>
+        }
+      />
+
       {/* Ciudadano */}
       <Route
         path="/tramites"
