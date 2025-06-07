@@ -17,6 +17,12 @@ app.use('/api/auth', authRoutes);
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/usuarios', userRoutes);
 
+// ✅ Nueva ruta de trámites
+const tramiteRoutes = require('./routes/tramiteRoutes');
+app.use('/api/tramites', tramiteRoutes);
+//ruta de chat gpt
+const chatRoutes = require("./routes/chatRoutes");
+app.use("/api/chat", chatRoutes);
+
 
 module.exports = app;
-
