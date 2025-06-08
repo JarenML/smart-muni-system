@@ -1,100 +1,28 @@
 const express = require("express");
 const router = express.Router();
 const { verifyToken } = require("../middlewares/authMiddleware");
-const { Notificacion } = require("../models");
+const notificacionController = require("../controllers/notificacionController");
 
 // Obtener notificaciones del usuario autenticado
-router.get("/", verifyToken, async (req, res) => {
-    const notificaciones = await Notificacion.findAll({
-        where: { user_id: req.user.id },
-        order: [["fecha", "DESC"]]
-    });
-    res.json(notificaciones);
-});
+router.get("/", verifyToken, notificacionController.obtenerNotificaciones);
 
 // Marcar una notificación como leída
-router.put("/:id/leida", verifyToken, async (req, res) => {
-    const notificacion = await Notificacion.findOne({
-        where: { id: req.params.id, user_id: req.user.id }
-    });
-    if (!notificacion) return res.status(404).json({ message: "No encontrada" });
-
-    notificacion.leido = true;
-    await notificacion.save();
-    res.json({ message: "Marcada como leída" });
-});
+router.put("/:id/leida", verifyToken, notificacionController.marcarLeida);
 
 // ✅ Nueva ruta para marcar todas como leídas
-router.put("/todas/leidas", verifyToken, async (req, res) => {
-    try {
-        await Notificacion.update(
-            { leido: true },
-            { where: { user_id: req.user.id } }
-        );
-        res.json({ message: "Todas las notificaciones marcadas como leídas" });
-    } catch (error) {
-        console.error("Error al marcar todas como leídas:", error);
-        res.status(500).json({ message: "Error interno" });
-    }
-});
+router.put("/todas/leidas", verifyToken, notificacionController.marcarTodasLeidas);
 
 // Eliminar una notificación por ID
-router.delete("/:id", verifyToken, async (req, res) => {
-    try {
-        const noti = await Notificacion.findOne({
-            where: {
-                id: req.params.id,
-                user_id: req.user.id // para asegurar que solo borre sus notificaciones
-            }
-        });
-
-        if (!noti) return res.status(404).json({ message: "No encontrada" });
-
-        await noti.destroy();
-        res.json({ message: "Notificación eliminada" });
-    } catch (err) {
-        console.error("❌ Error al eliminar notificación:", err);
-        res.status(500).json({ message: "Error interno" });
-    }
-});
+router.delete("/:id", verifyToken, notificacionController.eliminarNotificacion);
 
 // Eliminar todas las notificaciones leídas del usuario autenticado
-router.delete("/leidas/todas", verifyToken, async (req, res) => {
-    try {
-        const eliminadas = await Notificacion.destroy({
-            where: {
-                user_id: req.user.id,
-                leido: true
-            }
-        });
-
-        res.json({ message: `${eliminadas} notificaciones leídas eliminadas` });
-    } catch (error) {
-        console.error("❌ Error al eliminar notificaciones leídas:", error);
-        res.status(500).json({ message: "Error al eliminar notificaciones" });
-    }
-});
+router.delete("/leidas/todas", verifyToken, notificacionController.eliminarTodasLeidas);
 
 // Contador de notificaciones no leídas
-router.get("/no-leidas/count", verifyToken, async (req, res) => {
-    try {
-        const count = await Notificacion.count({
-            where: {
-                user_id: req.user.id,
-                leido: false
-            }
-        });
+router.get("/no-leidas/count", verifyToken, notificacionController.contarNoLeidas);
 
-        res.json({ count });
-    } catch (error) {
-        console.error("❌ Error al contar notificaciones no leídas:", error);
-        res.status(500).json({ message: "Error al contar notificaciones" });
-    }
-});
-
-const { eliminarTodas } = require("../controllers/notificacionController");
 // Eliminar todas las notificaciones del usuario autenticado
-router.delete("/", verifyToken, eliminarTodas);
+router.delete("/", verifyToken, notificacionController.eliminarTodas);
 
 
 module.exports = router;

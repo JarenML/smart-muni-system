@@ -26,7 +26,10 @@ exports.marcarLeida = async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: "Error al marcar como leída" });
     }
-    exports.marcarTodasLeidas = async (req, res) => {
+    
+};
+
+exports.marcarTodasLeidas = async (req, res) => {
         try {
             await Notificacion.update(
                 { leido: true },
@@ -36,7 +39,57 @@ exports.marcarLeida = async (req, res) => {
         } catch (err) {
             res.status(500).json({ message: "Error al marcar todas como leídas" });
         }
-    };
+};
+
+exports.eliminarNotificacion = async (req, res) => {
+    try {
+        const noti = await Notificacion.findOne({
+            where: {
+                id: req.params.id,
+                user_id: req.user.id // para asegurar que solo borre sus notificaciones
+            }
+        });
+
+        if (!noti) return res.status(404).json({ message: "No encontrada" });
+
+        await noti.destroy();
+        res.json({ message: "Notificación eliminada" });
+    } catch (err) {
+        console.error("❌ Error al eliminar notificación:", err);
+        res.status(500).json({ message: "Error interno" });
+    }
+};
+
+exports.eliminarTodasLeidas = async (req, res) => {
+    try {
+        const eliminadas = await Notificacion.destroy({
+            where: {
+                user_id: req.user.id,
+                leido: true
+            }
+        });
+
+        res.json({ message: `${eliminadas} notificaciones leídas eliminadas` });
+    } catch (error) {
+        console.error("❌ Error al eliminar notificaciones leídas:", error);
+        res.status(500).json({ message: "Error al eliminar notificaciones" });
+    }
+};
+
+exports.contarNoLeidas = async (req, res) => {
+    try {
+        const count = await Notificacion.count({
+            where: {
+                user_id: req.user.id,
+                leido: false
+            }
+        });
+
+        res.json({ count });
+    } catch (error) {
+        console.error("❌ Error al contar notificaciones no leídas:", error);
+        res.status(500).json({ message: "Error al contar notificaciones" });
+    }
 };
 
 // Eliminar todas las notificaciones del usuario
