@@ -14,4 +14,8 @@ router.put("/cambiar-estado", verifyToken, requireAdmin, curriculoController.cha
 // Ruta protegida para obtener un currículum por ID (ciudadano o admin pueden acceder)
 router.get("/:id", verifyToken, curriculoController.getCurriculoById);
 
+
+// Ruta para subir y crear un nuevo currículum
+router.post("/", verifyToken, curriculoController.createCurriculo);
+
 module.exports = router;

@@ -12,10 +12,10 @@ const {
 
 const { verifyToken } = require("../middlewares/authMiddleware");
 const { requireAdmin } = require("../middlewares/roleMiddleware");
-const upload = require("../middlewares/uploadMiddleware"); // Middleware para archivos
+const { uploadTramite } = require("../middlewares/uploadMiddleware"); // Middleware para archivos
 
 // Crear trámite con archivo adjunto (ciudadano)
-router.post("/", verifyToken, upload.single("archivo"), crearTramite);
+router.post("/", verifyToken, uploadTramite, crearTramite);
 
 // Obtener los propios trámites (ciudadano)
 router.get("/mis", verifyToken, obtenerMisTramites);
