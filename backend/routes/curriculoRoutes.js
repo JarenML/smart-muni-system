@@ -8,6 +8,6 @@ const curriculoController = require("../controllers/curriculoController");
 router.get("/", verifyToken, requireAdmin, curriculoController.getAllCurriculos);
 
 // Cambiar el estado de un currículum (solo admin)
-//router.put("/cambiar-estado", verifyToken, requireAdmin, curriculoController.changeCurriculoStatus);
+router.put("/cambiar-estado", verifyToken, requireAdmin, curriculoController.changeCurriculoStatus);
 
 module.exports = router;
