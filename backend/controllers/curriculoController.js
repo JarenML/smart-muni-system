@@ -44,3 +44,29 @@ exports.changeCurriculoStatus = async (req, res) => {
         res.status(500).json({ message: "Error interno del servidor" });
     }
 };
+
+
+// Obtener un currículum por ID
+exports.getCurriculoById = async (req, res) => {
+    try {
+        const { id } = req.params; 
+
+        // Buscar el currículum por su ID
+        const curriculo = await Curriculo.findByPk(id, {
+            include: [{
+                model: User, 
+                attributes: ['id', 'nombre', 'email', 'telefono', 'direccion']
+            }]
+        });
+
+        if (!curriculo) {
+            return res.status(404).json({ message: "Currículum no encontrado" });
+        }
+
+        // Enviar la información del currículum
+        res.json(curriculo);
+    } catch (error) {
+        console.error("Error al obtener currículum:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};
