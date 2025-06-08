@@ -6,8 +6,8 @@ import Card from "../../components/common/Card";
 import FormField from "../../components/common/FormField";
 import Button from "../../components/common/Button";
 
-import { useAuth } from "../../contexts/AuthContext";
 import { useNotification } from "../../contexts/NotificationContext";
+import { authService } from "../../services/api";
 
 import {
   validateEmail,
@@ -18,14 +18,14 @@ import {
 
 const Register = () => {
   const navigate = useNavigate();
-  const { register } = useAuth();
   const { addNotification } = useNotification();
 
   const [form, setForm] = useState({
-    name: "",
+    nombre: "",      // Cambiar a 'nombre' para coincidir con la BD
     dni: "",
     email: "",
-    phone: "",
+    telefono: "",    // Cambiar a 'telefono'
+    direccion: "",   // Agregar dirección (opcional)
     password: "",
     confirmPassword: "",
   });
@@ -45,8 +45,8 @@ const Register = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    const nameValidation = validateRequired(form.name, "El nombre");
-    if (nameValidation !== true) newErrors.name = nameValidation;
+    const nombreValidation = validateRequired(form.nombre, "El nombre");
+    if (nombreValidation !== true) newErrors.nombre = nombreValidation;
 
     const dniValidation = validateRequired(form.dni, "El DNI");
     if (dniValidation !== true) newErrors.dni = dniValidation;
@@ -54,8 +54,8 @@ const Register = () => {
     const emailValidation = validateEmail(form.email);
     if (emailValidation !== true) newErrors.email = emailValidation;
 
-    const phoneValidation = validatePhone(form.phone);
-    if (phoneValidation !== true) newErrors.phone = phoneValidation;
+    const telefonoValidation = validatePhone(form.telefono);
+    if (telefonoValidation !== true) newErrors.telefono = telefonoValidation;
 
     const passwordValidation = validateMinLength(
       form.password,
@@ -86,25 +86,36 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const result = await register({
-        name: form.name,
+      const userData = {
+        nombre: form.nombre,
         dni: form.dni,
         email: form.email,
-        phone: form.phone,
+        telefono: form.telefono,
+        direccion: form.direccion || null,
         password: form.password,
-      });
+        rol: "ciudadano" // Por defecto todos son ciudadanos
+      };
 
-      if (result.success) {
-        addNotification(
-          "Registro exitoso. Por favor, inicie sesión",
-          "success"
-        );
-        navigate("/login");
-      } else {
-        addNotification(result.error || "Error al registrar usuario", "error");
+      const result = await authService.register(userData);
+
+      addNotification(
+        "Registro exitoso. Por favor, inicie sesión",
+        "success"
+      );
+      navigate("/login");
+      
+    } catch (error) {
+      console.error('Error en registro:', error);
+      
+      let errorMessage = "Error al registrar usuario";
+      
+      if (error.message.includes('email')) {
+        errorMessage = "El correo electrónico ya está registrado";
+      } else if (error.message.includes('dni')) {
+        errorMessage = "El DNI ya está registrado";
       }
-    } catch (err) {
-      addNotification("Error al registrar usuario", "error");
+      
+      addNotification(errorMessage, "error");
     } finally {
       setLoading(false);
     }
@@ -137,11 +148,11 @@ const Register = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <FormField
               label="Nombre Completo"
-              id="name"
-              name="name"
-              value={form.name}
+              id="nombre"
+              name="nombre"
+              value={form.nombre}
               onChange={handleChange}
-              error={errors.name}
+              error={errors.nombre}
               required
               icon={<User className="h-5 w-5 text-gray-400" />}
               placeholder="Tu nombre completo"
@@ -175,15 +186,25 @@ const Register = () => {
 
             <FormField
               label="Teléfono"
-              id="phone"
-              name="phone"
-              value={form.phone}
+              id="telefono"
+              name="telefono"
+              value={form.telefono}
               onChange={handleChange}
-              error={errors.phone}
+              error={errors.telefono}
               required
               icon={<Phone className="h-5 w-5 text-gray-400" />}
               placeholder="9XXXXXXXX"
               helper="Formato: 9 dígitos"
+            />
+
+            <FormField
+              label="Dirección (Opcional)"
+              id="direccion"
+              name="direccion"
+              value={form.direccion}
+              onChange={handleChange}
+              icon={<Contact className="h-5 w-5 text-gray-400" />}
+              placeholder="Tu dirección"
             />
 
             <FormField

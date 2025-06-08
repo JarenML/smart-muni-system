@@ -53,7 +53,7 @@ const AppRouter = () => {
         path="/dashboard"
         element={
           <PrivateRoute allowedRoles={["admin", "ciudadano"]}>
-            {user?.role === "admin" ? (
+            {user?.rol === "admin" ? (
               <AdminLayout>
                 <DashboardAdmin />
               </AdminLayout>
@@ -185,7 +185,7 @@ const AppRouter = () => {
         path="/perfil"
         element={
           <PrivateRoute allowedRoles={["admin", "ciudadano"]}>
-            {user?.role === "admin" ? (
+            {user?.rol === "admin" ? (
               <AdminLayout>
                 <Profile />
               </AdminLayout>

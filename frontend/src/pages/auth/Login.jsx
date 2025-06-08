@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, LogIn } from "lucide-react";
 
 import Card from "../../components/common/Card";
@@ -13,8 +13,8 @@ import { validateEmail, validateRequired } from "../../utils/validators";
 
 const Login = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
+  // Usar directamente el login del AuthContext en lugar de authService
   const { login } = useAuth();
   const { addNotification } = useNotification();
 
@@ -63,19 +63,30 @@ const Login = () => {
     setLoading(true);
 
     try {
+      console.log('🔍 Starting login process...');
+      
+      // Usar el login del AuthContext que ya maneja todo
       const result = await login(form.email, form.password);
+      
+      console.log('🔍 Login result received:', result);
 
       if (result.success) {
         addNotification("Inicio de sesión exitoso", "success");
-
-        const from = location.state?.from?.pathname || "/";
-        navigate(from);
+        
+        console.log('🔍 Navigating to dashboard...');
+        
+        // Pequeña pausa para asegurar que el state se actualice
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 100);
+        
       } else {
         addNotification(result.error || "Credenciales incorrectas", "error");
       }
-    } catch (err) {
-      console.error("Login error:", err);
-      addNotification("Ocurrió un error al iniciar sesión", "error");
+
+    } catch (error) {
+      console.error('Error en login:', error);
+      addNotification("Error al iniciar sesión", "error");
     } finally {
       setLoading(false);
     }
@@ -137,11 +148,18 @@ const Login = () => {
               variant="primary"
               fullWidth
               loading={loading}
+              disabled={loading}
               icon={<LogIn className="h-5 w-5" />}
             >
-              Iniciar Sesión
+              {loading ? "Iniciando..." : "Iniciar Sesión"}
             </Button>
           </form>
+
+          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-xs text-green-800">
+              <strong>💡 Tip:</strong> Usa las credenciales de cualquier usuario que hayas registrado anteriormente.
+            </p>
+          </div>
         </Card>
       </div>
     </div>

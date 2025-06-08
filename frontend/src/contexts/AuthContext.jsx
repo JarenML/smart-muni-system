@@ -1,152 +1,169 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { authService } from "../services/api";
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-// 🧪 Usuario admin simulado para pruebas
-const ADMIN_USER = {
-  username: "makanaky1",
-  email: "makanaky@gmail.com",
-  password: "votame tu gaaa",
-  role: "admin",
-  name: "Administrador",
-};
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+  // Función para cargar usuario desde localStorage (memoizada)
+  const loadUserFromStorage = useCallback(() => {
+    try {
+      const storedUser = localStorage.getItem("user");
+      const storedToken = localStorage.getItem("token");
+      
+      console.log('🔍 Loading from storage:', { 
+        hasUser: !!storedUser, 
+        hasToken: !!storedToken,
+        userString: storedUser 
+      });
+      
+      if (storedUser && storedToken) {
+        const parsedUser = JSON.parse(storedUser);
+        console.log('🔍 Parsed user successfully:', parsedUser);
+        setUser(parsedUser);
+        return parsedUser;
+      } else {
+        console.log('🔍 No user or token found in storage');
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('🔴 Error loading user from storage:', error);
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      setUser(null);
     }
-    setLoading(false);
+    return null;
   }, []);
 
-  const login = (email, password) => {
-    const normalizedEmail = email.toLowerCase().trim();
-
-    if (
-      normalizedEmail === ADMIN_USER.email &&
-      password === ADMIN_USER.password
-    ) {
-      setUser(ADMIN_USER);
-      localStorage.setItem("user", JSON.stringify(ADMIN_USER));
-      return { success: true, user: ADMIN_USER };
+  // Inicialización única
+  useEffect(() => {
+    if (!initialized) {
+      console.log('🔍 AuthContext initializing...');
+      loadUserFromStorage();
+      setInitialized(true);
+      setLoading(false);
     }
+  }, [initialized, loadUserFromStorage]);
 
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const foundUser = users.find(
-      (u) =>
-        u.email.toLowerCase().trim() === normalizedEmail &&
-        u.password === password
-    );
-
-    if (foundUser) {
-      setUser(foundUser);
-      localStorage.setItem("user", JSON.stringify(foundUser));
-      return { success: true, user: foundUser };
-    }
-
-    return { success: false, error: "Credenciales inválidas" };
-  };
-
-  const register = (userData) => {
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-
-    if (users.some((u) => u.email === userData.email)) {
-      return {
-        success: false,
-        error: "El correo electrónico ya está registrado",
+  // Login function
+  const login = async (email, password) => {
+    try {
+      console.log('🔍 Login attempt for:', email);
+      const result = await authService.login({ email, password });
+      
+      console.log('🔍 Login API result:', result);
+      
+      if (result && result.token && result.user) {
+        // Guardar en localStorage
+        localStorage.setItem("token", result.token);
+        localStorage.setItem("user", JSON.stringify(result.user));
+        
+        console.log('🔍 Saved to localStorage:', {
+          token: result.token,
+          user: result.user
+        });
+        
+        // Actualizar estado
+        setUser(result.user);
+        
+        console.log('🔍 User state updated to:', result.user);
+        
+        return { success: true, user: result.user };
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      console.error('🔴 Login error:', error);
+      return { 
+        success: false, 
+        error: error.message || "Error al iniciar sesión" 
       };
     }
-
-    const newUser = {
-      ...userData,
-      role: "ciudadano",
-      id: `user-${Date.now()}`,
-    };
-
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
-
-    return { success: true };
   };
 
-  const logout = () => {
+  // Register function
+  const register = async (userData) => {
+    try {
+      const result = await authService.register(userData);
+      return { success: true };
+    } catch (error) {
+      console.error('🔴 Register error:', error);
+      return { 
+        success: false, 
+        error: error.message || "Error al registrar usuario" 
+      };
+    }
+  };
+
+  // Logout function
+  const logout = useCallback(() => {
+    console.log('🔍 Logging out...');
     setUser(null);
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     navigate("/login");
-  };
+  }, [navigate]);
 
-  const updateProfile = (updatedData) => {
+  // Update profile function
+  const updateProfile = useCallback((updatedData) => {
     if (!user) return { success: false, error: "No hay usuario autenticado" };
 
     const updatedUser = { ...user, ...updatedData };
-
-    if (user.role === "ciudadano") {
-      const users = JSON.parse(localStorage.getItem("users") || "[]");
-      const updatedUsers = users.map((u) =>
-        u.id === user.id ? updatedUser : u
-      );
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
-    }
-
     setUser(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));
 
     return { success: true, user: updatedUser };
-  };
+  }, [user]);
 
-  // ✅ Nueva función: actualizar contraseña
-  const updatePassword = (currentPassword, newPassword) => {
-    if (!user) return { success: false, error: "Usuario no autenticado" };
+  // Computed values (memoizadas para evitar re-renders)
+  const isAuthenticated = !!(user && localStorage.getItem("token"));
+  const isAdmin = user?.rol === 'admin';
 
-    // Admin hardcodeado
-    if (user.email === ADMIN_USER.email) {
-      if (currentPassword !== ADMIN_USER.password) {
-        return { success: false, error: "Contraseña actual incorrecta" };
-      }
-
-      const updatedAdmin = { ...ADMIN_USER, password: newPassword };
-      setUser(updatedAdmin);
-      localStorage.setItem("user", JSON.stringify(updatedAdmin));
-      return { success: true };
+  // Debug logs para cambios de estado
+  useEffect(() => {
+    if (initialized) {
+      console.log('🔍 AuthContext state updated:', {
+        user: user,
+        userRole: user?.rol,
+        isAuthenticated,
+        isAdmin,
+        hasToken: !!localStorage.getItem("token")
+      });
     }
+  }, [user, isAuthenticated, isAdmin, initialized]);
 
-    // Usuario registrado
-    if (user.password !== currentPassword) {
-      return { success: false, error: "Contraseña actual incorrecta" };
-    }
-
-    const updatedUser = { ...user, password: newPassword };
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const updatedUsers = users.map((u) => (u.id === user.id ? updatedUser : u));
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    setUser(updatedUser);
-
-    return { success: true };
-  };
+  // Prevenir renderizado hasta que esté inicializado
+  if (!initialized || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   const value = {
     user,
+    setUser,
     loading,
     login,
     logout,
     register,
     updateProfile,
-    updatePassword, // 👈 Añadido aquí
-    isAuthenticated: !!user,
+    isAuthenticated,
+    isAdmin,
+    loadUserFromStorage,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };
