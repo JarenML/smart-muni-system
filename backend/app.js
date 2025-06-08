@@ -10,11 +10,9 @@ const app = express();
 // Middlewares globales
 app.use(cors());
 app.use(express.json());
-
-// Servir archivos subidos (como documentos de trámites)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Rutas
+// Rutas principales
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
@@ -24,10 +22,14 @@ app.use('/api/usuarios', userRoutes);
 const tramiteRoutes = require('./routes/tramiteRoutes');
 app.use('/api/tramites', tramiteRoutes);
 
-const chatRoutes = require('./routes/chatRoutes'); // ✅ nombre correcto
+const chatRoutes = require('./routes/chatRoutes');
 app.use('/api/chat', chatRoutes);
 
-// Fallback para rutas no encontradas
+// ✅ Notificaciones (debe ir antes del 404)
+const notificacionRoutes = require("./routes/notificacionRoutes");
+app.use("/api/notificaciones", notificacionRoutes);
+
+// Fallback 404
 app.use((req, res) => {
     res.status(404).json({ message: 'Ruta no encontrada' });
 });

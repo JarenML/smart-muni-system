@@ -102,12 +102,21 @@ const actualizarEstadoTramite = async (req, res) => {
             descripcion
         });
 
+        // ✅ Crear notificación antes de responder
+        const { Notificacion } = require("../models");
+        await Notificacion.create({
+            user_id: tramite.user_id,
+            tramite_id: tramite.id,
+            mensaje: `El estado de tu trámite "${tramite.titulo}" ha cambiado a "${estado_nuevo}".`
+        });
+
         res.json({ message: "Estado actualizado correctamente", tramite });
     } catch (error) {
         console.error("Error actualizando estado:", error);
         res.status(500).json({ message: "Error interno" });
     }
 };
+
 
 // Obtener historial de estados
 const obtenerHistorialTramite = async (req, res) => {
@@ -170,6 +179,8 @@ const descargarHistorialPDF = async (req, res) => {
         res.status(500).json({ message: "Error interno al generar PDF" });
     }
 };
+
+
 
 module.exports = {
     crearTramite,

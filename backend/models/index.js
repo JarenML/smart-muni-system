@@ -1,7 +1,11 @@
 const sequelize = require("../config/db");
-const User = require("./User");
-const Tramite = require("./Tramite");
-const EstadoTramiteHistorial = require("./EstadoTramiteHistorial")(sequelize, require("sequelize").DataTypes); // 👈
+const { DataTypes } = require("sequelize");
+
+// Importar modelos
+const User = require("./User")(sequelize, DataTypes);
+const Tramite = require("./Tramite")(sequelize, DataTypes);
+const EstadoTramiteHistorial = require("./EstadoTramiteHistorial")(sequelize, DataTypes);
+const Notificacion = require("./Notificacion")(sequelize, DataTypes); // ✅ NUEVO
 
 // Logs para debug
 console.log("🗂 Ejecutando index.js de modelos");
@@ -10,18 +14,27 @@ console.log("🗂 Ejecutando index.js de modelos");
 User.hasMany(Tramite, { foreignKey: 'user_id' });
 Tramite.belongsTo(User, { foreignKey: 'user_id' });
 
-Tramite.hasMany(EstadoTramiteHistorial, { foreignKey: 'tramite_id' }); // 👈
-EstadoTramiteHistorial.belongsTo(Tramite, { foreignKey: 'tramite_id' }); // 👈
+Tramite.hasMany(EstadoTramiteHistorial, { foreignKey: 'tramite_id' });
+EstadoTramiteHistorial.belongsTo(Tramite, { foreignKey: 'tramite_id' });
+
+// ✅ Relación para notificaciones
+User.hasMany(Notificacion, { foreignKey: 'user_id' });
+Notificacion.belongsTo(User, { foreignKey: 'user_id' });
+
+Tramite.hasMany(Notificacion, { foreignKey: 'tramite_id' });
+Notificacion.belongsTo(Tramite, { foreignKey: 'tramite_id' });
 
 // Sincronizar modelos (solo en desarrollo)
 sequelize
-    .sync({ alter: true }) // ⚠️ Cambiar a false en producción
+    .sync({ alter: true }) // ⚠️ Desactiva en producción
     .then(() => console.log("✅ Modelos sincronizados con la base de datos"))
     .catch((err) => console.error("❌ Error al sincronizar modelos:", err));
 
+// Exportar todos los modelos
 module.exports = {
   sequelize,
   User,
   Tramite,
-  EstadoTramiteHistorial // 👈 Exportación
+  EstadoTramiteHistorial,
+  Notificacion, // ✅ Exportar para uso en controladores
 };
