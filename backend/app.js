@@ -1,28 +1,35 @@
-// app.js
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
-require('./config/db'); // conexión Sequelize
+// Conexión a la base de datos
+require('./config/db');
 
 const app = express();
 
+// Middlewares globales
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static('uploads'));
 
-// Rutas (agregarás progresivamente)
+// Servir archivos subidos (como documentos de trámites)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Rutas
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/usuarios', userRoutes);
 
-// ✅ Nueva ruta de trámites
 const tramiteRoutes = require('./routes/tramiteRoutes');
 app.use('/api/tramites', tramiteRoutes);
-//ruta de chat gpt
-const chatRoutes = require("./routes/chatRoutes");
-app.use("/api/chat", chatRoutes);
 
+const chatRoutes = require('./routes/chatRoutes'); // ✅ nombre correcto
+app.use('/api/chat', chatRoutes);
+
+// Fallback para rutas no encontradas
+app.use((req, res) => {
+    res.status(404).json({ message: 'Ruta no encontrada' });
+});
 
 module.exports = app;

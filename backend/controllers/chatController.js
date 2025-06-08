@@ -1,30 +1,41 @@
-const axios = require("axios");
+const { Tramite } = require("../models");
+const { consultarChatGPT } = require("../services/chatgptService");
 
-exports.responderDuda = async (req, res) => {
-    const { pregunta } = req.body;
-
+exports.preguntarConContexto = async (req, res) => {
     try {
-        const response = await axios.post(
-            "https://api.openai.com/v1/chat/completions",
-            {
-                model: "gpt-3.5-turbo", // o gpt-4 si tienes acceso
-                messages: [
-                    { role: "system", content: "Eres un asistente municipal que responde dudas frecuentes sobre trámites del municipio." },
-                    { role: "user", content: pregunta }
-                ]
-            },
-            {
-                headers: {
-                    Authorization: `Bearer TU_API_KEY_DE_OPENAI`,
-                    "Content-Type": "application/json"
-                }
-            }
-        );
+        const { mensaje } = req.body;
 
-        const respuesta = response.data.choices[0].message.content;
+        if (!mensaje) {
+            return res.status(400).json({ message: "El mensaje es requerido" });
+        }
+
+        // 1. Consultar todos los trámites (puedes limitar si hay muchos)
+        const tramites = await Tramite.findAll({
+            attributes: ["id", "titulo", "estado", "prioridad", "tipo_detectado", "creado_en"]
+        });
+
+        // 2. Convertir en texto estructurado para el prompt
+        const resumen = tramites.map(t =>
+            `Trámite ${t.id}: ${t.titulo} (${t.tipo_detectado}) - prioridad ${t.prioridad}, estado: ${t.estado}, creado el ${t.creado_en}`
+        ).join('\n');
+
+        // 3. Crear contexto + pregunta del usuario
+        const contexto = `
+Eres un asistente virtual inteligente para una municipalidad. A continuación tienes una lista de trámites registrados:
+
+${resumen}
+
+Ahora responde la siguiente pregunta del usuario basándote solo en esta información:
+
+Usuario: ${mensaje}
+        `;
+
+        // 4. Enviar a OpenAI
+        const respuesta = await consultarChatGPT(contexto);
+
         res.json({ respuesta });
     } catch (error) {
-        console.error("Error al contactar a OpenAI:", error.message);
-        res.status(500).json({ message: "No se pudo obtener respuesta del asistente" });
+        console.error("❌ Error en chatbot con contexto:", error);
+        res.status(500).json({ message: "Error interno del asistente" });
     }
 };
