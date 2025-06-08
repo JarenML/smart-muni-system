@@ -10,7 +10,11 @@ router.post("/", verifyToken, async (req, res) => {
     if (!mensaje) return res.status(400).json({ message: "Mensaje requerido" });
 
     try {
-        const respuesta = await consultarChatGPT(mensaje);
+        const prompt = [
+            { role: "system", content: "Eres un asistente municipal que responde dudas frecuentes sobre trámites del municipio." },
+            { role: "user", content: mensaje }
+        ]
+        const respuesta = await consultarChatGPT(prompt);
         res.json({ respuesta });
     } catch (error) {
         console.error("❌ Error en consulta simple:", error);
