@@ -82,3 +82,17 @@ exports.changePassword = async (req, res) => {
         res.status(500).json({ message: "Error interno del servidor" });
     }
 };
+
+// Obtener todos los usuarios (solo admin)
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.findAll({
+            attributes: { exclude: ['password_hash'] }, // nunca envíes el hash!
+            order: [['creado_en', 'DESC']]
+        });
+        res.json(users);
+    } catch (error) {
+        console.error("Error al obtener usuarios:", error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+};

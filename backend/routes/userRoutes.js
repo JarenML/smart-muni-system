@@ -18,5 +18,6 @@ router.put("/change-user-role", verifyToken, requireAdmin, userController.change
 
 router.put("/cambiar-password", verifyToken, userController.changePassword);
 
+router.get("/", verifyToken, requireAdmin, userController.getAllUsers);
 
 module.exports = router;
