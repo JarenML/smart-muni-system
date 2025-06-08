@@ -6,6 +6,8 @@ const User = require("./User")(sequelize, DataTypes);
 const Tramite = require("./Tramite")(sequelize, DataTypes);
 const EstadoTramiteHistorial = require("./EstadoTramiteHistorial")(sequelize, DataTypes);
 const Notificacion = require("./Notificacion")(sequelize, DataTypes); // ✅ NUEVO
+const Curriculo = require("./Curriculo");
+
 
 // Logs para debug
 console.log("🗂 Ejecutando index.js de modelos");
@@ -24,6 +26,10 @@ Notificacion.belongsTo(User, { foreignKey: 'user_id' });
 Tramite.hasMany(Notificacion, { foreignKey: 'tramite_id' });
 Notificacion.belongsTo(Tramite, { foreignKey: 'tramite_id' });
 
+User.hasMany(Curriculo, { foreignKey: 'user_id' });  // 👈 Relación con Curriculo
+Curriculo.belongsTo(User, { foreignKey: 'user_id' });  // 👈 Relación con User
+
+
 // Sincronizar modelos (solo en desarrollo)
 sequelize
     .sync({ alter: true }) // ⚠️ Desactiva en producción
@@ -37,4 +43,5 @@ module.exports = {
   Tramite,
   EstadoTramiteHistorial,
   Notificacion, // ✅ Exportar para uso en controladores
+  Curriculo
 };

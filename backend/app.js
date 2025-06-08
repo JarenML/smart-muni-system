@@ -29,6 +29,9 @@ app.use('/api/chat', chatRoutes);
 const notificacionRoutes = require("./routes/notificacionRoutes");
 app.use("/api/notificaciones", notificacionRoutes);
 
+const curriculoRoutes = require("./routes/curriculoRoutes"); 
+app.use("/api/curriculos", curriculoRoutes);
+
 // Fallback 404
 app.use((req, res) => {
     res.status(404).json({ message: 'Ruta no encontrada' });
