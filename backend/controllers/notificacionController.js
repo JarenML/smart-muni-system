@@ -38,3 +38,15 @@ exports.marcarLeida = async (req, res) => {
         }
     };
 };
+
+// Eliminar todas las notificaciones del usuario
+exports.eliminarTodas = async (req, res) => {
+    try {
+        await Notificacion.destroy({ where: { user_id: req.user.id } });
+        res.json({ message: "Todas las notificaciones eliminadas correctamente." });
+    } catch (error) {
+        console.error("Error al eliminar notificaciones:", error);
+        res.status(500).json({ message: "Error al eliminar notificaciones." });
+    }
+};
+

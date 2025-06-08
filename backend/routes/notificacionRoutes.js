@@ -38,4 +38,63 @@ router.put("/todas/leidas", verifyToken, async (req, res) => {
     }
 });
 
+// Eliminar una notificación por ID
+router.delete("/:id", verifyToken, async (req, res) => {
+    try {
+        const noti = await Notificacion.findOne({
+            where: {
+                id: req.params.id,
+                user_id: req.user.id // para asegurar que solo borre sus notificaciones
+            }
+        });
+
+        if (!noti) return res.status(404).json({ message: "No encontrada" });
+
+        await noti.destroy();
+        res.json({ message: "Notificación eliminada" });
+    } catch (err) {
+        console.error("❌ Error al eliminar notificación:", err);
+        res.status(500).json({ message: "Error interno" });
+    }
+});
+
+// Eliminar todas las notificaciones leídas del usuario autenticado
+router.delete("/leidas/todas", verifyToken, async (req, res) => {
+    try {
+        const eliminadas = await Notificacion.destroy({
+            where: {
+                user_id: req.user.id,
+                leido: true
+            }
+        });
+
+        res.json({ message: `${eliminadas} notificaciones leídas eliminadas` });
+    } catch (error) {
+        console.error("❌ Error al eliminar notificaciones leídas:", error);
+        res.status(500).json({ message: "Error al eliminar notificaciones" });
+    }
+});
+
+// Contador de notificaciones no leídas
+router.get("/no-leidas/count", verifyToken, async (req, res) => {
+    try {
+        const count = await Notificacion.count({
+            where: {
+                user_id: req.user.id,
+                leido: false
+            }
+        });
+
+        res.json({ count });
+    } catch (error) {
+        console.error("❌ Error al contar notificaciones no leídas:", error);
+        res.status(500).json({ message: "Error al contar notificaciones" });
+    }
+});
+
+const { eliminarTodas } = require("../controllers/notificacionController");
+// Eliminar todas las notificaciones del usuario autenticado
+router.delete("/", verifyToken, eliminarTodas);
+
+
 module.exports = router;
