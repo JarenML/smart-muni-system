@@ -16,5 +16,7 @@ router.put("/update-user", verifyToken, userController.updateUser);
 // Route to change user role (Admin only)
 router.put("/change-user-role", verifyToken, requireAdmin, userController.changeUserRole);
 
+router.put("/cambiar-password", verifyToken, userController.changePassword);
+
 
 module.exports = router;
