@@ -84,7 +84,8 @@ exports.createCurriculo = async (req, res) => {
 
         // Extraer los campos del formulario
         const { cargo_postula, anios_experiencia, educacion } = req.body;
-        const archivo_url = req.file.path;
+        
+        let archivo_url = req.file.path;
 
         // Validaciones
         if (!cargo_postula || !anios_experiencia || !educacion || !archivo_url) {
@@ -112,6 +113,8 @@ exports.createCurriculo = async (req, res) => {
                     return res.status(500).json({ message: "Error al procesar el archivo DOCX", error: err.message });
                 }
             }
+
+            archivo_url = req.file ? `/uploads/curriculos/${req.file.filename}` : null;
 
             // Consultar a ChatGPT para la evaluación de IA y puntaje
             const prompt = [
