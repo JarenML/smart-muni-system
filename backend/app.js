@@ -1,14 +1,20 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+require('dotenv').config();
 
 // Conexión a la base de datos
 require('./config/db');
 
 const app = express();
+const corsOptions = {
+    origin: process.env.CORS_ORIGIN,  // Cargar el origen desde .env
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,  // Permite enviar cookies
+};
 
 // Middlewares globales
-app.use(cors());
+app.use(cors(corsOptions));  
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
