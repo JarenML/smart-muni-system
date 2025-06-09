@@ -13,7 +13,7 @@ import {
 const SidebarAdmin = ({ isOpen, closeSidebar }) => {
   const navItems = [
     {
-      path: "/admin",
+      path: "/dashboard",
       label: "Dashboard",
       icon: <LayoutDashboard className="w-5 h-5" />,
     },
