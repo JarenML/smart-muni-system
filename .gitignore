@@ -45,6 +45,9 @@ docker-compose.override.yml
 
 # 📁 Logs / uploads / temp
 logs/
-uploads/
+backend/uploads/curriculos/*
+backend/uploads/tramites/*
+!backend/uploads/curriculos/.gitkeep
+!backend/uploads/tramites/.gitkeep
 tmp/
 temp/

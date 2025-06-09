@@ -6,7 +6,7 @@ const crearTramite = async (req, res) => {
     try {
         const { titulo, descripcion } = req.body;
         const user_id = req.user.id;
-        const archivo_url = req.file ? `/uploads/${req.file.filename}` : null;
+        const archivo_url = req.file ? `/uploads/tramites/${req.file.filename}` : null;
 
         // Clasificación automática (simulada)
         let tipo_detectado = "Otros";

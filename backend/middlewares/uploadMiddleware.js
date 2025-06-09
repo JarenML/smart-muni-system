@@ -1,21 +1,17 @@
 const multer = require("multer");
 const path = require("path");
 
-// Configuración del almacenamiento
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "uploads/");  
-    },
-    filename: function (req, file, cb) {
-        const ext = path.extname(file.originalname);  
-        const name = file.originalname.split(".")[0];  
-        cb(null, `${Date.now()}-${name}${ext}`);  
-    }
-});
-
-// Middleware para cargar el currículum (campo "curriculumVitae")
 const uploadCurriculum = multer({ 
-    storage,
+    storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, "uploads/curriculos/");  // Subir los archivos a la carpeta 'uploads/curriculos/'
+        },
+        filename: function (req, file, cb) {
+            const ext = path.extname(file.originalname);  
+            const name = file.originalname.split(".")[0];  
+            cb(null, `${Date.now()}-${name}${ext}`);  // Nombre único para el archivo
+        }
+    }),
     limits: { fileSize: 5 * 1024 * 1024 },  // Limitar el tamaño a 5MB
     fileFilter: (req, file, cb) => {
         const ext = path.extname(file.originalname).toLowerCase();
@@ -26,9 +22,17 @@ const uploadCurriculum = multer({
     }
 }).single("curriculumVitae");  // Usa 'curriculumVitae' como nombre del campo
 
-// Middleware para cargar un archivo de trámite (campo "archivo")
 const uploadTramite = multer({
-    storage,
+    storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, "uploads/tramites/");  // Subir los archivos a la carpeta 'uploads/tramites/'
+        },
+        filename: function (req, file, cb) {
+            const ext = path.extname(file.originalname).toLowerCase();  
+            const name = file.originalname.split(".")[0];  
+            cb(null, `${Date.now()}-${name}${ext}`);  // Nombre único para el archivo
+        }
+    }),
     limits: { fileSize: 5 * 1024 * 1024 },  // Limitar el tamaño a 5MB
     fileFilter: (req, file, cb) => {
         const ext = path.extname(file.originalname).toLowerCase();
@@ -37,6 +41,7 @@ const uploadTramite = multer({
         }
         cb(null, true);
     }
-}).single("tramiteFile");  // Usa 'archivo' como nombre del campo
+}).single("tramiteFile");  // Usa 'tramiteFile' como nombre del campo
+
 
 module.exports = { uploadCurriculum, uploadTramite };
